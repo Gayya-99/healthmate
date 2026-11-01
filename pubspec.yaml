@@ -1,0 +1,28 @@
+name: healthmate
+description: "HealthMate - a personal health & wellness tracker built with Flutter and Provider (MVVM)."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.7
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State management (MVVM view models exposed with ChangeNotifier / ProxyProvider)
+  provider: ^6.1.5
+  # Date and number formatting (e.g. "18 August 2026", "7,850")
+  intl: ^0.20.2
+
+  cupertino_icons: ^1.0.8
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
