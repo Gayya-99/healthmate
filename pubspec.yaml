@@ -26,3 +26,19 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # Alexandria font (SIL Open Font License – see assets/fonts/OFL.txt).
+  # Bundled with the app so it works offline.
+  fonts:
+    - family: Alexandria
+      fonts:
+        - asset: assets/fonts/Alexandria-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Alexandria-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Alexandria-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Alexandria-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Alexandria-ExtraBold.ttf
+          weight: 800
