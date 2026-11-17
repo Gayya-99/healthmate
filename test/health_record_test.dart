@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:healthmate/features/health_records/data/models/health_record.dart';
+import 'package:healthmate/models/health_record.dart';
 
 void main() {
   final record = HealthRecord(
@@ -20,11 +20,11 @@ void main() {
     });
   });
 
-  test('fromMap(toMap()) returns an equal record', () {
+  test('fromMap(toMap()) gives back an equal record', () {
     expect(HealthRecord.fromMap(record.toMap()), record);
   });
 
-  test('toMap omits id for a new record', () {
+  test('a new record has no id in its map', () {
     final newRecord = HealthRecord(
       date: DateTime(2026, 8, 18),
       steps: 100,
