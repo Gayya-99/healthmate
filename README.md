@@ -2,7 +2,7 @@
 
 A Flutter app for recording daily **steps**, **calories burned** and **water intake**, reviewing past days, and tracking progress against daily goals.
 
-> **Current build: frontend only.** `DatabaseHelper` keeps records in memory, so data resets when the app restarts. Its methods are written to be swapped for sqflite later without changing the controller or screens (see *Adding SQLite later*).
+> Data is stored on the device in a local **SQLite** database (`healthmate.db`) using `sqflite`, so records stay after the app is closed.
 
 ## Features
 
@@ -51,7 +51,7 @@ flowchart TD
 ```
 
 - **Model** – `HealthRecord` (plus `DailySummary`, `DailyGoals`) with `toMap()` / `fromMap()` for the database.
-- **Database** – `DatabaseHelper` (singleton) is the only class that stores data. It currently keeps rows in memory in the same shape as the SQLite `health_records` table.
+- **Database** – `DatabaseHelper` (singleton) opens the SQLite database, creates the tables on first launch, inserts dummy data, and runs all queries (parameterised with `?`).
 - **Controller** – `HealthController` holds app state, performs CRUD, search/filter and dashboard calculations, and calls `notifyListeners()` so the views rebuild. It is provided to the widget tree with `ChangeNotifierProvider`.
 - **Views** – screens that display controller state and send user actions back to it. `widgets/metric_card.dart` contains reusable components (metric card, progress ring, record tile, etc.).
 
@@ -63,7 +63,7 @@ lib/
 ├── models/
 │   └── health_record.dart          # HealthRecord model + date/number helpers
 ├── database/
-│   └── database_helper.dart        # Data storage (in-memory now, sqflite next) + dummy data
+│   └── database_helper.dart        # SQLite (sqflite): tables, CRUD, search, settings, dummy data
 ├── controllers/
 │   └── health_controller.dart      # State, CRUD, search, dashboard logic, validators
 ├── views/
@@ -74,6 +74,7 @@ lib/
     └── metric_card.dart            # Reusable UI components
 test/
 ├── health_record_test.dart         # Model
+├── database_helper_test.dart       # Real SQL queries on an in-memory SQLite DB
 ├── health_controller_test.dart     # CRUD, search, dashboard logic
 ├── validators_test.dart            # Form validation rules
 └── widget_test.dart                # UI flows
@@ -93,6 +94,9 @@ test/
 | Package | Why |
 |---|---|
 | `provider` | Official, lightweight state management – exposes `HealthController` (a `ChangeNotifier`) to every screen |
+| `sqflite` | Local SQLite database required by the brief |
+| `path` | Builds the database file path safely on each platform |
+| `sqflite_common_ffi` (dev) | Runs the same SQLite code in tests on a PC |
 | `intl` | Date and number formatting ("18 August 2026", "7,850") |
 
 **Font:** [Alexandria](https://fonts.google.com/specimen/Alexandria) (SIL Open Font License), bundled in `assets/fonts/`.
@@ -106,10 +110,19 @@ flutter test
 flutter build apk --release   # output: build/app/outputs/flutter-apk/app-release.apk
 ```
 
-## Adding SQLite later
+## Database
 
-1. Add `sqflite` and `path` to `pubspec.yaml`.
-2. In `database/database_helper.dart`, open the database and create the `health_records` table (SQL is in the class comment).
-3. Replace the body of each method with the matching sqflite call (`query`, `insert`, `update`, `delete`). `HealthRecord.toMap()` / `fromMap()` already match the table columns.
+```sql
+CREATE TABLE health_records (
+  id       INTEGER PRIMARY KEY AUTOINCREMENT,
+  date     TEXT    NOT NULL,   -- "yyyy-MM-dd" (sorts correctly as text)
+  steps    INTEGER NOT NULL DEFAULT 0,
+  calories INTEGER NOT NULL DEFAULT 0,
+  water    INTEGER NOT NULL DEFAULT 0  -- millilitres
+);
+CREATE INDEX idx_health_records_date ON health_records (date);
 
-The method names stay the same, so `HealthController` and the screens do not change.
+CREATE TABLE app_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);  -- goals, theme
+```
+
+On first launch the tables are created and 7 dummy records (today and the previous 6 days) are inserted. To start again with fresh sample data, uninstall the app or use **⋮ → Reload sample data** on the Records screen.
