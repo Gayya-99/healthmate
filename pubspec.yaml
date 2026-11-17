@@ -1,5 +1,5 @@
 name: healthmate
-description: "HealthMate - a personal health & wellness tracker built with Flutter and Provider (MVVM)."
+description: "HealthMate - a personal health & wellness tracker built with Flutter, Provider and SQLite."
 publish_to: 'none'
 
 version: 1.0.0+1
@@ -11,8 +11,12 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # State management (MVVM view models exposed with ChangeNotifier / ProxyProvider)
+  # State management (HealthController is a ChangeNotifier provided to all screens)
   provider: ^6.1.5
+  # SQLite database (stores health records on the device)
+  sqflite: ^2.4.2
+  # Builds the database file path in a platform-safe way
+  path: ^1.9.1
   # Date and number formatting (e.g. "18 August 2026", "7,850")
   intl: ^0.20.2
 
@@ -21,6 +25,9 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
+  # Runs the same SQLite code in unit/widget tests on your PC
+  sqflite_common_ffi: ^2.3.6
 
   flutter_lints: ^6.0.0
 
